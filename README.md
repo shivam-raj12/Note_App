@@ -21,11 +21,12 @@ Welcome to our user-friendly note-taking app designed for simplicity and securit
 ## Screenshots
 
 
-![Home Screen](https://github.com/shivam-raj12/Note_App/blob/master/assests/screenshots/Home%20Screen.png)
-![Detail Note Screen](https://github.com/shivam-raj12/Note_App/blob/master/assests/screenshots/Detail%20Screen.png)
-![Add Note Screen(1)](https://github.com/shivam-raj12/Note_App/blob/master/assests/screenshots/Add%20Note%20Screen(1).png)
-![Add Note Screen(2)](https://github.com/shivam-raj12/Note_App/blob/master/assests/screenshots/Add%20Note%20Screen(2).png)
-![Security Screen](https://github.com/shivam-raj12/Note_App/blob/master/assests/screenshots/Security%20Screen.png)
+
+| ![Home Screen](https://github.com/shivam-raj12/Note_App/blob/master/assests/screenshots/Home%20Screen.png) | ![Home Screen Dark](https://github.com/shivam-raj12/Note_App/blob/master/assests/screenshots/Home%20Screen%20Dark.png) |
+| ---------------------- | ---------------------- |
+| ![Detail Note Screen](https://github.com/shivam-raj12/Note_App/blob/master/assests/screenshots/Detail%20Screen.png) | ![Add Note Screen(1)](https://github.com/shivam-raj12/Note_App/blob/master/assests/screenshots/Add%20Note%20Screen(1).png) |
+| ![Add Note Screen(2)](https://github.com/shivam-raj12/Note_App/blob/master/assests/screenshots/Add%20Note%20Screen(2).png) | ![Security Screen](https://github.com/shivam-raj12/Note_App/blob/master/assests/screenshots/Security%20Screen.png) |
+
 
 
 
@@ -38,9 +39,10 @@ Welcome to our user-friendly note-taking app designed for simplicity and securit
 - Enhanced user experience with Animations
 - Expanded background color options
 - Performance enhancements
-These updates aim to improve functionality, user experience, and security while addressing performance optimizations for a more robust note-taking application.
 
-#### Something crazy is waiting🔥. Stay tuned🚀
+These updates aim to improve functionality, user experience, and security while addressing performance optimizations for a more robust note-taking application.
+<h3 align="center">Something crazy is waiting🔥. Stay tuned!🚀</h3>
+
 ## Demo
 
 You can download the app [here](https://github.com/shivam-raj12/Note_App/blob/master/assests/app/Note%20App.apk).
