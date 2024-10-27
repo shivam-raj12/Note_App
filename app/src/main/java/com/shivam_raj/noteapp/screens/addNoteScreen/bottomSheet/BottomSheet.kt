@@ -101,6 +101,9 @@ fun BottomSheet(
             FilledTonalButton(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
+                    coroutineScope.launch {
+                        sheetState.hide()
+                    }
                     onSaveClick(
                         Priority.getValueWithId(selectedPriority),
                         backgroundColor

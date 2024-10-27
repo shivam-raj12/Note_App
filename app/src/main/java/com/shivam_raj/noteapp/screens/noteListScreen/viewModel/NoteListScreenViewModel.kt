@@ -1,5 +1,6 @@
 package com.shivam_raj.noteapp.screens.noteListScreen.viewModel
 
+import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -12,7 +13,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shivam_raj.noteapp.database.Note
 import com.shivam_raj.noteapp.database.NoteRepository
+import com.shivam_raj.noteapp.onlineDatabase.FetchingManager
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 /**
@@ -20,7 +23,7 @@ import kotlinx.coroutines.launch
  *
  * @param noteRepository An instance of [NoteRepository] class. It requires for doing database operations like fetching or deleting the note etc.
  *
- * @property noteList List of all the saved notes.
+ * @property offlineNoteList List of all the saved notes.
  * @property pinIcon Whether to show pinned icon or unpin icon when multiple notes are selected.
  * @property pinnedNotesCount Counting all the pinned notes item in [selectedNotes]
  * @property searchBarTextValue Text shown in search field. This value is used to filter notes.
@@ -34,7 +37,16 @@ import kotlinx.coroutines.launch
  */
 class NoteListScreenViewModel(private val noteRepository: NoteRepository) : ViewModel() {
 
-    val noteList: Flow<List<Note>> = noteRepository.getAllNote()
+    val offlineNoteList: Flow<List<Note>> = noteRepository.getAllNote()
+
+    val onlineNoteList: Flow<List<Note>> = FetchingManager.getSyncedNoteList()
+
+    val sharedNoteList: Flow<List<Note>> = combine(
+        FetchingManager.getReadOnlySharedNoteList(),
+        FetchingManager.getWritingAllowedSharedNoteList()
+    ) { l1, l2 ->
+        (l1.map { it.copy(allowEditing = false) } + l2).distinctBy { it.id }
+    }
 
     /**
      * This variable decides whether to show pin icon or unpin icon in the top bar when multiple notes are selected.
@@ -112,6 +124,7 @@ class NoteListScreenViewModel(private val noteRepository: NoteRepository) : View
     }
 
     fun addNoteToSelectedNoteList(note: Note) {
+        Log.d("TAG", "addNoteToSelectedNoteList: $note")
         if (!selectedNotes.contains(note)) {
             selectedNotes.add(note)
             if (note.pinnedAt != null) pinnedNotesCount++

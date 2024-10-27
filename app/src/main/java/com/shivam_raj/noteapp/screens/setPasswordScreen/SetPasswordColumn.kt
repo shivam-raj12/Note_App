@@ -19,7 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,8 +28,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -42,6 +45,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.shivam_raj.noteapp.R
+import com.shivam_raj.noteapp.database.Note
 import com.shivam_raj.noteapp.database.NoteRepository
 import com.shivam_raj.noteapp.screens.noteListScreen.noteRepo
 
@@ -66,17 +70,23 @@ fun SetPassword(
     var showHintDialog by remember {
         mutableStateOf(false)
     }
-
+    val list = remember { mutableListOf<Note>() }
     /**
      * List of all the saved notes which have already an existing password.
      *  - It is used to display all the previous password which user have been used for their notes. So that user can select note password among one of them.
      *  @see SetPasswordColumnViewModel
      */
-    val list by viewModel<SetPasswordColumnViewModel>(factory = viewModelFactory {
+    val viewModel = viewModel<SetPasswordColumnViewModel>(factory = viewModelFactory {
         initializer {
             SetPasswordColumnViewModel(noteRepo().noteRepository)
         }
-    }).list.collectAsState(initial = listOf())
+    })
+    LaunchedEffect(viewModel) {
+        viewModel.list.collect {
+            list.addAll(it)
+        }
+    }
+
     Column(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.surfaceContainerLow)
@@ -91,7 +101,11 @@ fun SetPassword(
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 19.sp
             )
-            IconButton(onClick = {focusManager.clearFocus(); showHintDialog = !showHintDialog }) {
+            IconButton(onClick = remember {
+                {
+                    focusManager.clearFocus(); showHintDialog = !showHintDialog
+                }
+            }) {
                 Icon(
                     imageVector = Icons.Outlined.Info,
                     contentDescription = "Show use",
@@ -100,7 +114,7 @@ fun SetPassword(
             }
             HintDialogBox(
                 expandedHintDialog = showHintDialog,
-                onDismissHintDialog = { showHintDialog = false },
+                onDismissHintDialog = remember{{ showHintDialog = false }},
                 hintText = "Set a password to secure your notes. This ensures that only you can access them.\nFor easy management, consider using the same password for all notes.\nClick the side icon to select a password from your other notes."
             )
         }
@@ -117,9 +131,9 @@ fun SetPassword(
                 singleLine = true,
                 trailingIcon = {
                     if (password.isNotEmpty()) {
-                        IconButton(onClick = { showPassword = !showPassword }) {
+                        IconButton(onClick = remember{{ showPassword = !showPassword }}) {
                             Icon(
-                                painter = painterResource(id = if (showPassword) R.drawable.password_visibility_off else R.drawable.password_visible),
+                                painter = rememberVectorPainter(ImageVector.vectorResource(id = if (showPassword) R.drawable.password_visibility_off else R.drawable.password_visible)),
                                 contentDescription = if (showPassword) "Hide password" else "Show password"
                             )
                         }
@@ -129,12 +143,14 @@ fun SetPassword(
                     '*'
                 ),
                 keyboardOptions = KeyboardOptions(
+                    autoCorrectEnabled = false,
                     keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Done,
-                    autoCorrect = false
+                    imeAction = ImeAction.Done
                 ),
-                keyboardActions = KeyboardActions(onDone = {
-                    focusManager.clearFocus()
+                keyboardActions = KeyboardActions(onDone = remember {
+                    {
+                        focusManager.clearFocus()
+                    }
                 }),
                 supportingText = {
                     Text(text = "It is recommended to keep all your note's password same.")
@@ -142,9 +158,11 @@ fun SetPassword(
             )
             Box {
                 FilledIconButton(
-                    onClick = {
-                        focusManager.clearFocus()
-                        expanded = !expanded
+                    onClick = remember {
+                        {
+                            focusManager.clearFocus()
+                            expanded = !expanded
+                        }
                     },
                 ) {
                     Icon(
@@ -182,9 +200,11 @@ fun SetPassword(
                                 title = it.noteTitle,
                                 description = it.noteDescription,
                                 password = it.password ?: "",
-                                onClick = {
-                                    expanded = false
-                                    onPasswordValueChange(it.password ?: "")
+                                onClick = remember {
+                                    {
+                                        expanded = false
+                                        onPasswordValueChange(it.password ?: "")
+                                    }
                                 }
                             )
                         }

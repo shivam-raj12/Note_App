@@ -12,5 +12,9 @@ class NoteRepository(private val dao: NoteDao) : NoteDao {
 
     override fun getAllPasswordProtectedNote(): Flow<List<Note>> = dao.getAllPasswordProtectedNote()
 
-    override suspend fun updatePasswordForNoteID(id: Int, password: String) = dao.updatePasswordForNoteID(id, password)
+    override suspend fun updatePasswordForNoteID(id: String, password: String) =
+        dao.updatePasswordForNoteID(id, password)
+
+//    override suspend fun updateIsOnlineSyncedForNoteID(id: Int, isOnlineSynced: Boolean) =
+//        dao.updateIsOnlineSyncedForNoteID(id, isOnlineSynced)
 }

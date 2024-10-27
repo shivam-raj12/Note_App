@@ -2,22 +2,12 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("com.google.devtools.ksp") version "1.9.0-1.0.13"
-}
-
-kotlin {
-    sourceSets {
-        debug {
-            kotlin.srcDir("build/generated/ksp/debug/kotlin")
-        }
-        release {
-            kotlin.srcDir("build/generated/ksp/release/kotlin")
-        }
-    }
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
     namespace = "com.shivam_raj.noteapp"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.shivam_raj.noteapp"
@@ -71,6 +61,9 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storage)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -87,14 +80,20 @@ dependencies {
     //View Model
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
-    //Compose destination
-    implementation(libs.animations.core)
-    ksp(libs.ksp)
-
     //Lottie Animation
     implementation(libs.lottie.compose)
 
     //Splash Screen
     implementation(libs.androidx.core.splashscreen)
 
+    //Official navigation library
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.animation)
+
+    //Live Data
+    implementation(libs.androidx.runtime.livedata)
+
+    //Image Loading Library
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
 }

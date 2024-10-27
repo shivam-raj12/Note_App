@@ -21,7 +21,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -81,8 +83,8 @@ fun LargeDropDownMenuItem(
             ) {
                 Text(text = if (passwordVisibility) password else "*".repeat(password.length))
                 Spacer(modifier = Modifier.width(8.dp))
-                IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
-                    Icon(painter = painterResource(id = if (passwordVisibility) R.drawable.password_visibility_off else R.drawable.password_visible), contentDescription = null)
+                IconButton(onClick = remember{{ passwordVisibility = !passwordVisibility }}) {
+                    Icon(painter = rememberVectorPainter(ImageVector.vectorResource(id = if (passwordVisibility) R.drawable.password_visibility_off else R.drawable.password_visible)), contentDescription = null)
                 }
             }
         }

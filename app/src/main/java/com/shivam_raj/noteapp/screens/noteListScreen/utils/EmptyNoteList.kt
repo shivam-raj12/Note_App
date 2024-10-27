@@ -2,26 +2,19 @@ package com.shivam_raj.noteapp.screens.noteListScreen.utils
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,19 +25,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.shivam_raj.noteapp.LottieAnimations
 import com.shivam_raj.noteapp.R
-import kotlinx.coroutines.launch
 
 /**
  * When user don't have any saved note, this composable will be shown.
  */
 @Composable
 fun EmptyNoteList(
-    onAddNoteClicked: () -> Unit
+    onAddNoteClicked: () -> Unit,
+    moveToLoginScreen: () -> Unit
 ) {
-    val snakeBarHostState = remember {
-        SnackbarHostState()
-    }
-    val coroutineScope = rememberCoroutineScope()
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -88,31 +78,10 @@ fun EmptyNoteList(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer,
                     contentColor = MaterialTheme.colorScheme.onSecondaryContainer
                 ),
-                onClick = {
-                if (snakeBarHostState.currentSnackbarData==null) {
-                    coroutineScope.launch {
-                        snakeBarHostState.showSnackbar("Hold tight!😜 This feature is being updated. It'll be back soon!🔥")
-                    }
-                }
-            }) {
+                onClick = moveToLoginScreen
+            ) {
                 Text(text = "Login to your account")
             }
-        }
-    }
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .navigationBarsPadding(),
-        contentAlignment = Alignment.BottomCenter
-    ) {
-        SnackbarHost(
-            hostState = snakeBarHostState
-        ) {
-            Snackbar(
-                snackbarData = it,
-                containerColor = MaterialTheme.colorScheme.surfaceBright,
-                contentColor = MaterialTheme.colorScheme.onSurface
-            )
         }
     }
 

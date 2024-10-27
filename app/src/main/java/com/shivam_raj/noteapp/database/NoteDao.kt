@@ -22,5 +22,8 @@ interface NoteDao {
     fun getAllPasswordProtectedNote(): Flow<List<Note>>
 
     @Query("UPDATE Note_Table SET password = :password WHERE id = :id")
-    suspend fun updatePasswordForNoteID(id: Int, password:String)
+    suspend fun updatePasswordForNoteID(id: String, password:String)
+
+//    @Query("UPDATE Note_Table SET isOnlineSynced = :isOnlineSynced WHERE id = :id")
+//    suspend fun updateIsOnlineSyncedForNoteID(id: Int, isOnlineSynced:Boolean)
 }

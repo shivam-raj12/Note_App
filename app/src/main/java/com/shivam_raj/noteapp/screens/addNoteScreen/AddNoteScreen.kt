@@ -1,26 +1,30 @@
 package com.shivam_raj.noteapp.screens.addNoteScreen
 
-import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -29,23 +33,19 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.ramcosta.composedestinations.result.NavResult
-import com.ramcosta.composedestinations.result.ResultRecipient
+import androidx.navigation.NavController
 import com.shivam_raj.noteapp.database.Note
 import com.shivam_raj.noteapp.database.Priority
+import com.shivam_raj.noteapp.navigationGraph.Screens
 import com.shivam_raj.noteapp.screens.addNoteScreen.viewModel.AddNoteScreenViewModel
-import com.shivam_raj.noteapp.screens.destinations.SetPasswordScreenDestination
 import com.shivam_raj.noteapp.screens.noteListScreen.noteRepo
 import com.shivam_raj.noteapp.screens.setPasswordScreen.SecurityData
 
-@Destination
 @Composable
 fun AddNoteScreen(
-    navigator: DestinationsNavigator,
-    resultRecipient: ResultRecipient<SetPasswordScreenDestination, SecurityData>,
-    note: Note? = null
+    navController: NavController,
+    note: Note?,
+    securityData: SecurityData?
 ) {
     val addNoteScreenViewModel: AddNoteScreenViewModel = viewModel(factory = viewModelFactory {
         initializer {
@@ -54,82 +54,97 @@ fun AddNoteScreen(
     })
     val focusManager = LocalFocusManager.current
 
-    resultRecipient.onNavResult {
-        when (it) {
-            NavResult.Canceled -> {}
-            is NavResult.Value -> addNoteScreenViewModel.setSecurityData(it.value)
-        }
-    }
     val topBarButtonEnabled by remember {
         derivedStateOf {
             (addNoteScreenViewModel.title.value.isNotEmpty() && addNoteScreenViewModel.description.value.isNotEmpty())
         }
     }
+
+    val snackBarHostState = remember {
+        SnackbarHostState()
+    }
+    LaunchedEffect(Unit) {
+        if (note?.allowEditing == false){
+            snackBarHostState.showSnackbar(
+                message = "You are not allowed to edit this note. Changes made to this note will be saved locally (only for you).",
+                withDismissAction = true,
+                duration = SnackbarDuration.Long
+            )
+        }
+    }
     Scaffold(
         modifier = Modifier
+            .fillMaxSize()
             .imePadding()
-            .fillMaxSize(),
+            .background(MaterialTheme.colorScheme.background),
+        snackbarHost = {
+            SnackbarHost(snackBarHostState)
+        },
         topBar = {
-            TopBar(
+            AddNoteTopBar(
                 priority = if (note != null) Priority.getValueWithId(note.notePriority) else null,
                 enabled = topBarButtonEnabled,
                 isNewNote = note == null,
                 onSecurityClick = {
-                    navigator.navigate(
-                        SetPasswordScreenDestination(
-                            defaultSecurityData = addNoteScreenViewModel.securityData.value,
-                        )
-                    )
+                    navController.navigate(Screens.SetPasswordScreen.route)
                 },
                 onBackArrowClick = {
-                    navigator.popBackStack()
+                    navController.navigateUp()
                 },
                 colorIndex = note?.colorIndex,
                 onSaveClick = { priority, colorIndex ->
-                    addNoteScreenViewModel.onSaveNoteButtonClick(priority, colorIndex)
-                    navigator.popBackStack()
+                    addNoteScreenViewModel.onSaveNoteButtonClick(
+                        priority,
+                        colorIndex,
+                        securityData ?: SecurityData(
+                            note?.password,
+                            note?.fakeTitle,
+                            note?.fakeDescription
+                        )
+                    )
+                    navController.navigate(Screens.NoteListScreen.route) {
+                        popUpTo(Screens.AddNoteScreen.route) {
+                            inclusive = true
+                        }
+                    }
                 }
             )
         }
-    ) { paddingValues ->
+    ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(
-                    top = paddingValues.calculateTopPadding(),
-                    bottom = paddingValues.calculateBottomPadding()
-                )
+                .padding(it)
                 .padding(
                     horizontal = 8.dp,
-                    vertical = 5.dp
                 )
-                .verticalScroll(rememberScrollState())
-                .animateContentSize(),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             OutlinedTextField(
                 value = addNoteScreenViewModel.title.value,
-                onValueChange = { if (it.length <= 60) addNoteScreenViewModel.setTitle(it) },
+                onValueChange = addNoteScreenViewModel::setTitle,
+                singleLine = true,
+                maxLines = 1,
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = {
                     Text(text = "Note's Title")
                 },
                 textStyle = MaterialTheme.typography.titleLarge,
-                suffix = {
-                    Text(text = "${addNoteScreenViewModel.title.value.length}/60")
-                },
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Sentences,
-                    imeAction = ImeAction.Next,
+                    autoCorrectEnabled = true,
                     keyboardType = KeyboardType.Text,
-                    autoCorrect = true
+                    imeAction = ImeAction.Next
                 ),
                 keyboardActions = KeyboardActions(
                     onNext = {
                         focusManager.moveFocus(FocusDirection.Down)
                     }
+                ),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color.Transparent,
+                    unfocusedBorderColor = Color.Transparent
                 )
             )
+            HorizontalDivider()
             OutlinedTextField(
                 value = addNoteScreenViewModel.description.value,
                 onValueChange = addNoteScreenViewModel::setDescription,
@@ -142,9 +157,13 @@ fun AddNoteScreen(
                 textStyle = MaterialTheme.typography.bodyLarge,
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Sentences,
-                    keyboardType = KeyboardType.Text,
-                    autoCorrect = true
+                    autoCorrectEnabled = true,
+                    keyboardType = KeyboardType.Text
                 ),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color.Transparent,
+                    unfocusedBorderColor = Color.Transparent
+                )
             )
         }
     }

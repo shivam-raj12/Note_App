@@ -7,8 +7,6 @@ import com.shivam_raj.noteapp.database.Note
 import com.shivam_raj.noteapp.database.NoteRepository
 import com.shivam_raj.noteapp.database.Priority
 import com.shivam_raj.noteapp.screens.setPasswordScreen.SecurityData
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class AddNoteScreenViewModel(
@@ -18,15 +16,6 @@ class AddNoteScreenViewModel(
     val title = mutableStateOf(note?.noteTitle ?: "")
 
     val description = mutableStateOf(note?.noteDescription ?: "")
-
-    private val _securityData = MutableStateFlow(
-        SecurityData(
-            fakeTitle = note?.fakeTitle,
-            fakeDescription = note?.fakeDescription,
-            password = note?.password
-        )
-    )
-    val securityData = _securityData.asStateFlow()
 
     fun setTitle(title: String) {
         this.title.value = title
@@ -38,24 +27,25 @@ class AddNoteScreenViewModel(
 
     fun onSaveNoteButtonClick(
         priority: Priority,
-        colorIndex: Int?
+        colorIndex: Int?,
+        securityData: SecurityData
     ) {
         val updatedNote = note?.copy(
-            noteTitle = title.value,
-            noteDescription = description.value,
+            noteTitle = title.value.trim(),
+            noteDescription = description.value.trim(),
             notePriority = priority.id,
-            fakeTitle = securityData.value.fakeTitle,
-            fakeDescription = securityData.value.fakeDescription,
-            password = securityData.value.password,
+            fakeTitle = securityData.fakeTitle,
+            fakeDescription = securityData.fakeDescription,
+            password = securityData.password,
             colorIndex = colorIndex,
             lastUpdate = System.currentTimeMillis()
         ) ?: Note(
-            noteTitle = title.value,
-            noteDescription = description.value,
+            noteTitle = title.value.trim(),
+            noteDescription = description.value.trim(),
             notePriority = priority.id,
-            fakeTitle = securityData.value.fakeTitle,
-            fakeDescription = securityData.value.fakeDescription,
-            password = securityData.value.password,
+            fakeTitle = securityData.fakeTitle,
+            fakeDescription = securityData.fakeDescription,
+            password = securityData.password,
             colorIndex = colorIndex,
             lastUpdate = System.currentTimeMillis(),
             dateAdded = System.currentTimeMillis()
@@ -66,9 +56,4 @@ class AddNoteScreenViewModel(
             }
         }
     }
-
-    fun setSecurityData(securityData: SecurityData) {
-        _securityData.value = securityData
-    }
-
 }

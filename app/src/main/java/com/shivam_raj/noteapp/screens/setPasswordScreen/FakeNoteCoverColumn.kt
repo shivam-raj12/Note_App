@@ -64,7 +64,11 @@ fun FakeNoteCover(
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 19.sp
             )
-            IconButton(onClick = { focusManager.clearFocus(); showHintDialog = !showHintDialog }) {
+            IconButton(onClick = remember {
+                {
+                    focusManager.clearFocus(); showHintDialog = !showHintDialog
+                }
+            }) {
                 Icon(
                     imageVector = Icons.Outlined.Info,
                     contentDescription = "Show use",
@@ -86,12 +90,12 @@ fun FakeNoteCover(
             },
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Sentences,
+                autoCorrectEnabled = true,
                 keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Next,
-                autoCorrect = true
+                imeAction = ImeAction.Next
             ),
             keyboardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                onNext = remember { { focusManager.moveFocus(FocusDirection.Down) } }
             )
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -106,12 +110,12 @@ fun FakeNoteCover(
             maxLines = 5,
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Sentences,
+                autoCorrectEnabled = true,
                 keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Done,
-                autoCorrect = true
+                imeAction = ImeAction.Done
             ),
             keyboardActions = KeyboardActions(
-                onDone = { focusManager.clearFocus() }
+                onDone = remember { { focusManager.clearFocus() } }
             )
         )
     }

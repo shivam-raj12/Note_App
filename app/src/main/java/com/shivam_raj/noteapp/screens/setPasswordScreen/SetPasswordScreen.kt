@@ -33,8 +33,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.result.ResultBackNavigator
+import androidx.navigation.NavController
 
 /**
  * A composable destination function for entering password, fake Title, fake Description for the note.
@@ -43,10 +42,9 @@ import com.ramcosta.composedestinations.result.ResultBackNavigator
  * */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@Destination
 fun SetPasswordScreen(
     defaultSecurityData: SecurityData,
-    resultNavigator: ResultBackNavigator<SecurityData>
+    navController: NavController,
 ) {
     var fakeTitle by remember {
         mutableStateOf(defaultSecurityData.fakeTitle ?: "")
@@ -76,7 +74,7 @@ fun SetPasswordScreen(
             ) {
                 CenterAlignedTopAppBar(
                     navigationIcon = {
-                        IconButton(onClick = { resultNavigator.navigateBack() }) {
+                        IconButton(onClick = remember { { navController.popBackStack() } }) {
                             Icon(imageVector = Icons.Rounded.Close, contentDescription = "Close")
                         }
                     },
@@ -96,7 +94,7 @@ fun SetPasswordScreen(
                 Spacer(modifier = Modifier.height(16.dp))
                 SetPassword(
                     password = password,
-                    onPasswordValueChange = { password = it }
+                    onPasswordValueChange = remember{{ password = it }}
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 FakeNoteCover(
@@ -106,15 +104,19 @@ fun SetPasswordScreen(
                     onFakeDescriptionValueChange = { fakeDescription = it }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                Button(onClick = {
-                    resultNavigator.navigateBack(
-                        SecurityData(
-                            password = password.ifEmpty { null },
-                            fakeTitle = fakeTitle.ifEmpty { null },
-                            fakeDescription = fakeDescription.ifEmpty { null }
-                        )
-                    )
-                }) {
+                Button(
+                    onClick = remember {
+                        {
+                            navController.previousBackStackEntry?.savedStateHandle?.set("security_data",
+                                SecurityData(
+                                    password = password.ifEmpty { null },
+                                    fakeTitle = fakeTitle.ifEmpty { null },
+                                    fakeDescription = fakeDescription.ifEmpty { null }
+                                )
+                            )
+                            navController.popBackStack()
+                        }
+                    }) {
                     Text(text = "Save Changes")
                 }
             }

@@ -1,7 +1,6 @@
 package com.shivam_raj.noteapp.screens.noteListScreen
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
@@ -59,7 +58,6 @@ private const val CUT_RADIUS = 20
  * @param isSelected A boolean or null value to represent whether the note is selected or not.
  * @see DeleteButton
  */
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NoteItem(
     modifier: Modifier = Modifier,
@@ -134,8 +132,10 @@ fun NoteItem(
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
-                DeleteButton(isSelected = isSelected) {
-                    showDialog = true
+                if (note.allowEditing) {
+                    DeleteButton(isSelected = isSelected) {
+                        showDialog = true
+                    }
                 }
             }
             Row(
@@ -145,7 +145,7 @@ fun NoteItem(
                 if (note.pinnedAt != null) {
                     Icon(
                         painter = painterResource(id = R.drawable.pin),
-                        contentDescription = null,
+                        contentDescription = "Pinned note",
                         modifier = Modifier
                             .size(18.dp)
                             .alpha(0.6f)

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -32,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.shivam_raj.noteapp.R
+import com.shivam_raj.noteapp.screens.noteListScreen.utils.ProfileIcon
 
 /**
  * A composable function which displays the topBar of a [NoteHomeScreen].
@@ -61,10 +63,12 @@ fun NoteListTopBar(
     onClearFilterClicked: () -> Unit,
     onCloseActionModeClick: () -> Unit,
     showAction: Boolean = false,
+    onLogoutButtonClicked:()->Unit,
+    moveToSignInScreen:()->Unit,
+    moveToProfileScreen:()->Unit,
     content: @Composable RowScope.() -> Unit
 ) {
     val focusManager = LocalFocusManager.current
-
     Column(
         modifier = modifier,
     ) {
@@ -98,6 +102,20 @@ fun NoteListTopBar(
                         ),
                         fontWeight = FontWeight.Medium
                     )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .statusBarsPadding()
+                            .height(48.dp),
+                        contentAlignment = Alignment.CenterEnd
+                    ) {
+                        ProfileIcon(
+                            modifier = Modifier.size(40.dp),
+                            onLogoutButtonClicked = onLogoutButtonClicked,
+                            moveToSignInScreen = moveToSignInScreen,
+                            moveToProfileScreen = moveToProfileScreen
+                        )
+                    }
                 }
             }
         }
