@@ -41,6 +41,7 @@ Welcome to our user-friendly note-taking app designed for simplicity and securit
 - Performance enhancements
 
 These updates aim to improve functionality, user experience, and security while addressing performance optimizations for a more robust note-taking application.
+
 **Something crazy is waiting🔥. Stay tuned!🚀**
 
 ## Demo
